@@ -7,7 +7,7 @@ Use Localization.unitypackage to automaticaly import as asset, or just import "L
 # How to use
 1.You need add localization script on some object on scene.
 
-2. Add some language by clicking on "Add language".
+2.Add some language by clicking on "Add language".
 
 ![dbc00ba041b82fbf7649529b2a2d9c50](https://user-images.githubusercontent.com/32653296/46013087-d345ce80-c0d3-11e8-9b39-3a9079cdf0c2.png)
 
