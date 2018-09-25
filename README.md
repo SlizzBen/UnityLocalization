@@ -21,5 +21,7 @@ Use Localization.unitypackage to automaticaly import as asset, or just import "L
 
 5. Now to get this string just use method Localization.GetString("list's key", "string's key") from namespace "SlizzLoc"(SlizzLoc.Localization.GetString("list's key", "string's key"))
 
+To change language use method SlizzLoc.Localization.Instance.ChangeLanguage(language's index)
+
 # To use it on NUI(UnityUI)
 Add script UGUIText to object with Text component and choose which string it must get. 
