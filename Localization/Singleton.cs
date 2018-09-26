@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Homebrew
+namespace SlizzLoc
 {
     public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {

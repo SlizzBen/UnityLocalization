@@ -7,7 +7,7 @@ using UnityEngine.Windows.Speech;
 
 namespace SlizzLoc
 {
-    public class Localization : Homebrew.Singleton<Localization>
+    public class Localization : Singleton<Localization>
     {
 
 
@@ -37,6 +37,24 @@ namespace SlizzLoc
 
             Debug.LogError("[Localization]There are no dict with name " + dict);
             return "";
+        }
+
+        public static bool HasString(string dict, string key)
+        {
+
+            foreach (var d in Instance.dicts)
+            {
+                if (d.key == dict)
+                {
+                    foreach(var str in d.strings)
+                    {
+                        if (str.key == key)
+                            return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public Localization_dict GetDictByKey(string key)

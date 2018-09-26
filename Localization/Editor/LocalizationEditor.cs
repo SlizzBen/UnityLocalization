@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.UI;
 
 namespace SlizzLoc
 {
@@ -22,7 +23,6 @@ namespace SlizzLoc
         {
             OnDictsUpdate();
             showed.Clear();
-            grey_text = GetGreyTexture();
             Localization main = (Localization)target;
             main.OnLoad = OnDictsUpdate;
         }
@@ -81,6 +81,12 @@ namespace SlizzLoc
             {
                 main.LoadFromFile();
             }
+
+            if (GUILayout.Button("Get all string"))
+            {
+                GetAllTextObjects();
+            }
+            DrawCustomLayer(18, 250, 255, 0);
         }
 
         void ShowLanguages(Localization main)
@@ -221,16 +227,7 @@ namespace SlizzLoc
             }
             EndLevel();
         }
-
-        Texture2D GetGreyTexture()
-        {
-            Texture2D text = new Texture2D(1, 1);
-            Color col = new Color(100f / 255f, 100f / 255f, 100f / 255f, 0.3f);
-            col.a = 0.3f;
-            text.SetPixel(0, 0, col);
-            text.Apply();
-            return text;
-        }
+        
 
         Texture2D GetTextureByColor(float r, float g, float b, float a)
         {
@@ -256,7 +253,83 @@ namespace SlizzLoc
             return text;
         }
 
+        public void GetAllTextObjects()
+        {
+            GetAllUIText();
+            GetAll3DText();
+        }
 
+        void GetAllUIText()
+        {
+            Text[] array = GameObject.FindObjectsOfType<Text>();
+            var dict = Localization.Instance.GetDictByKey("UI");
+            if (dict == null)
+            {
+                dict = new Localization_dict() { key = "UI" };
+                Localization.Instance.dicts.Add(dict);
+            }
+
+            foreach (var obj in array)
+            {
+                UGUIText comp = obj.GetComponent<UGUIText>();
+                if (comp != null)
+                    continue;
+                string text = obj.text;
+                if (text != "")
+                {
+                    comp = obj.gameObject.AddComponent<UGUIText>();
+                    if (!Localization.HasString("UI", text))
+                    {
+                        var new_string = new Localization_string() { key = text };
+                        new_string.strings.Add(text);
+                        dict.strings.Add(new_string);
+                    }
+
+                    comp.list = "UI";
+                    comp.key = text;
+                }
+                else
+                {
+                    continue;
+                }
+
+            }
+        }
+
+        void GetAll3DText()
+        {
+            TextMesh[] array = GameObject.FindObjectsOfType<TextMesh>();
+            var dict = Localization.Instance.GetDictByKey("TextMesh");
+            if (dict == null)
+            {
+                dict = new Localization_dict() { key = "TextMesh" };
+                Localization.Instance.dicts.Add(dict);
+            }
+            foreach (var obj in array)
+            {
+                U3DText comp = obj.GetComponent<U3DText>();
+                if (comp != null)
+                    continue;
+                string text = obj.text;
+                if (text != "")
+                {
+                    comp = obj.gameObject.AddComponent<U3DText>();
+                    if (!Localization.HasString("TextMesh", text))
+                    {
+                        var new_string = new Localization_string() { key = text };
+                        new_string.strings.Add(text);
+                        dict.strings.Add(new_string);
+                    }
+                    comp.list = "TextMesh";
+                    comp.key = text;
+                }
+                else
+                {
+                    continue;
+                }
+
+            }
+        }
 
         void DrawCustomLayer(float height, float r, float g, float b, float a = 0.3f)
         {
