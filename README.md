@@ -11,15 +11,15 @@ Use Localization.unitypackage to automaticaly import as asset, or just import "L
 
 ![screen1](https://user-images.githubusercontent.com/32653296/66780980-d710e280-eeda-11e9-9cae-018516bb005c.png)
 
-3.Now you need to add some languages in "Options" tab
+3.Add some languages in "Options" tab
 
 ![s2](https://user-images.githubusercontent.com/32653296/66781119-2e16b780-eedb-11e9-8f75-a180083bf360.png)
 
-4.Now you can add new "Group", just enter the name and press "Add"
+4.Add new "Group", just enter the name and press "Add"
 
 ![dd9421e55ab50bfa9762e9b510d9348e](https://user-images.githubusercontent.com/32653296/66781174-48509580-eedb-11e9-9010-5b2a1fcf5e8e.png)
 
-5.Now you can add "String" to "Group" by enter the string's name and press "Add" and there you can add value for every languages
+5.Add "String" to "Group" by enter the string's name and press "Add" and there you can add value for every languages
 
 ![s4](https://user-images.githubusercontent.com/32653296/66781373-c2811a00-eedb-11e9-9842-377801e6ac03.png)
 
