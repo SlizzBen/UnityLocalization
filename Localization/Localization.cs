@@ -7,218 +7,132 @@ using UnityEngine.Windows.Speech;
 
 namespace SlizzLoc
 {
-    public class Localization : Singleton<Localization>
+    public static class Localization
     {
 
-
-        public int Current_language_index;
-        public List<string> languages = new List<string>();
-        public List<Localization_dict> dicts = new List<Localization_dict>();
-        public System.Action OnLoad;
-
-        public System.Action OnChangeLanguage;
-
-        /// <summary>
-        /// Get string by key
-        /// </summary>
-        /// <param name="dict">Name of list</param>
-        /// <param name="key">Key of string</param>
-        /// <returns></returns>
-        public static string GetString(string dict, string key)
+        public static string GetString(string groupKey, string key)
         {
+            if (ShowErrorNonPrefab())
+                return "";
 
-            foreach (var d in Instance.dicts)
+            var dictBody = LocalizationHolder.Prefab.dicts.Find(d => d.key == groupKey);
+            if(dictBody == null)
             {
-                if (d.key == dict)
-                {
-                    return d.GetString(key, Instance.Current_language_index);
-                }
+                Debug.LogError("Can't find group with key " + groupKey);
+                return "";
             }
-
-            Debug.LogError("[Localization]There are no dict with name " + dict);
-            return "";
-        }
-
-        public static bool HasString(string dict, string key)
-        {
-
-            foreach (var d in Instance.dicts)
+            var str = dictBody.strings.Find(s => s.key == key);
+            if(str == null)
             {
-                if (d.key == dict)
-                {
-                    foreach(var str in d.strings)
-                    {
-                        if (str.key == key)
-                            return true;
-                    }
-                }
+                Debug.LogError("Can't find string with key " + key);
+                return "";
             }
-
-            return false;
+            return str.GetString();
         }
 
-        public Localization_dict GetDictByKey(string key)
+        public static string GetString(int groupIndex, string key)
         {
-            foreach(var dict in dicts)
+            if (ShowErrorNonPrefab())
+                return "";
+
+            if(groupIndex >= LocalizationHolder.Prefab.dicts.Count)
             {
-                if (dict.key == key)
-                    return dict;
+                Debug.LogError("Can't find group with index " + groupIndex);
+                return "";
             }
-            return null;
+            return GetString(LocalizationHolder.Prefab.dicts[groupIndex].key, key);
         }
 
-        public void RemoveLanguageAtIndex(int ind)
+        public static void AddString(string groupKey, string key, params string[] strings)
         {
-            languages.RemoveAt(ind);
-            foreach (var d in dicts)
+            if (ShowErrorNonPrefab())
+                return;
+
+            var dictBody = LocalizationHolder.Prefab.dicts.Find(d => d.key == groupKey);
+            if (dictBody == null)
             {
-                foreach (var str in d.strings)
-                {
-                    if(str.strings.Count > ind)
-                    str.strings.RemoveAt(ind);
-                }
-            }
-        }
-
-        private void Start()
-        {
-            GetLanguage();
-        }
-
-        public void ChangeLanguage(int index)
-        {
-            Current_language_index = index;
-            Save();
-            if (OnChangeLanguage != null)
-                OnChangeLanguage();
-
-        }
-
-
-        private string LangStringParam = "Language_param";
-
-        void GetLanguage()
-        {
-            int i = PlayerPrefs.GetInt(LangStringParam);
-            ChangeLanguage(i);
-        }
-
-        void Save()
-        {
-            int i = Current_language_index;
-            PlayerPrefs.SetInt(LangStringParam, i);
-        }
-
-#if UNITY_EDITOR
-
-        public void SaveToFile()
-        {
-            string save_file_path = "Assets/localization.json";
-            Localization_save_data save_file = new Localization_save_data();
-            save_file.lists = new List<Localization_dict>(dicts);
-            save_file.languages = new List<string>(languages);
-            if (!System.IO.File.Exists(save_file_path))
-            {
-                var writer = System.IO.File.Create(save_file_path);
-                writer.Close();
-            }
-            System.IO.File.WriteAllText(save_file_path, JsonUtility.ToJson(save_file));
-            Debug.Log("Saved to " + save_file_path);
-        }
-
-        public void LoadFromFile()
-        {
-            string save_file_path = "Assets/localization.json";
-            if (System.IO.File.Exists(save_file_path) == false)
-            {
-                Debug.Log("No file");
+                Debug.LogError("Can't find group with key " + groupKey);
                 return;
             }
-            string text = System.IO.File.ReadAllText(save_file_path);
-            Localization_save_data save_file = JsonUtility.FromJson<Localization_save_data>(text);
-            dicts = new List<Localization_dict>(save_file.lists);
-            languages = new List<string>(save_file.languages);
-            UnityEditor.EditorUtility.SetDirty(gameObject);
-            if (OnLoad != null)
-                OnLoad();
+
+            dictBody.strings.Add(new LocalizationString() { key = key, strings = new List<string>(strings) });
         }
 
-#endif
-
-        public int GetLanguagesCount()
+        public static void AddGroup(string key)
         {
-            return languages.Count;
+            if (ShowErrorNonPrefab())
+                return;
+
+            LocalizationHolder.Prefab.dicts.Add(new LocalizationDict() { key = key });
         }
-
-        public int GetDictsCount()
+        
+        public static LocalizationDict GetGroup(string key)
         {
-            return dicts.Count;
-        }
-    }
+            if (ShowErrorNonPrefab())
+                return null;
 
-    [System.Serializable]
-    public class Localization_save_data
-    {
-        public List<Localization_dict> lists = new List<Localization_dict>();
-        public List<string> languages = new List<string>();
-    }
-
-
-    [System.Serializable]
-    public class Localization_dict
-    {
-        public string key = "";
-        public List<Localization_string> strings = new List<Localization_string>();
-
-        public string GetString(string key, int lang_index)
-        {
-            foreach (var str in strings)
+            var dictBody = LocalizationHolder.Prefab.dicts.Find(d => d.key == key);
+            if (dictBody == null)
             {
-                if (str.key == key)
-                    return str.GetString(lang_index);
+                Debug.LogError("Can't find group with key " + key);
+                return null;
             }
 
-            return "";
+            return dictBody;
         }
 
-    }
-
-    [System.Serializable]
-    public class Localization_string
-    {
-        public string key = "";
-        public List<string> strings = new List<string>();
-
-        void Repair()
+        public static int GetLanguage()
         {
-            var count = Localization.Instance.GetLanguagesCount();
-            for (int i = strings.Count; i < count; i++)
+            if (LocalizationHolder.Prefab == null)
             {
-                strings.Add("");
+                ShowErrorNonPrefab();
+                return -1;
+            }
+            return LocalizationHolder.Prefab.SelectedLangueage;
+        }
+
+        public static void SetLanguage(int index)
+        {
+            if(LocalizationHolder.Prefab == null)
+            {
+                ShowErrorNonPrefab();
+                return;
             }
         }
 
-        public string GetString(int language_index)
+        public static int AddLanguage(string lang)
         {
-            if (strings.Count <= language_index)
-                Repair();
-
-            return strings[language_index];
+            if (LocalizationHolder.Prefab == null)
+            {
+                ShowErrorNonPrefab();
+                return -1;
+            }
+            LocalizationHolder.Prefab.Languages.Add(lang);
+            return LocalizationHolder.Prefab.Languages.Count - 1;
         }
-    }
+
+        public static void RemoveLanguage(int index)
+        {
+            if (ShowErrorNonPrefab())
+                return;
+            var pref = LocalizationHolder.Prefab;
+            pref.Languages.RemoveAt(index);
+            foreach(var dict in pref.dicts)
+            {
+                dict.strings.RemoveAt(index);
+            }
+        }
 
 
-    [System.Serializable]
-    public class Localization_dictionary_list
-    {
-        public string Name;
-        public List<Localization_dict> strings = new List<Localization_dict>();
-    }
 
-
-    public enum ELanguages
-    {
-        Rus,
-        Eng
+        static bool ShowErrorNonPrefab()
+        {
+            if(LocalizationHolder.Prefab == null)
+            {
+                Debug.LogError("There are no LocalizationHolder prefab. Please open Window/Localization Slizz and init!");
+                return true;
+            }
+            return false;
+        }
     }
 }

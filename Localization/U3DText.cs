@@ -6,29 +6,22 @@ using UnityEngine.UI;
 namespace SlizzLoc
 {
     [RequireComponent(typeof(TextMesh))]
-    public class U3DText : MonoBehaviour
+    public class U3DText : LocObject
     {
-
-        public string list;
-        public string key;
-
         TextMesh txt_obj;
 
-        private void Awake()
+        protected override void OnAwake()
         {
-            Localization.Instance.OnChangeLanguage += UpdateText;
+            txt_obj = GetComponent<TextMesh>();
         }
 
-
-
-
-        void UpdateText()
+        public override void UpdateText()
         {
-            if (txt_obj == null)
-                txt_obj = GetComponent<TextMesh>();
-            txt_obj.text = Localization.GetString(list, key);
+            if(txt_obj != null)
+            {
+                txt_obj.text = Localization.GetString(GroupKey, StringKey);
+            }
         }
-
 
 
     }
