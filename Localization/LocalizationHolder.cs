@@ -39,5 +39,11 @@ namespace SlizzLoc
             }
         }
 
+        public static void Save()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(Prefab);
+#endif
+        }
     }
 }

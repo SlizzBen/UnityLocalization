@@ -30,10 +30,14 @@ namespace SlizzLoc
         public string key = "";
         public List<string> strings = new List<string>();
 
-        void Repair()
+        public void Repair()
         {
             var count = LocalizationHolder.Prefab.Languages.Count;
-            for (int i = strings.Count; i < count; i++)
+            while(strings.Count > count)
+            {
+                strings.RemoveAt(strings.Count - 1);
+            }
+            while(strings.Count < count)
             {
                 strings.Add("");
             }

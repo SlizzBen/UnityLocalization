@@ -10,6 +10,8 @@ namespace SlizzLoc
     public static class Localization
     {
 
+        private static bool _DebugModeEnable = false;
+
         public static string GetString(string groupKey, string key)
         {
             if (ShowErrorNonPrefab())
@@ -18,13 +20,15 @@ namespace SlizzLoc
             var dictBody = LocalizationHolder.Prefab.dicts.Find(d => d.key == groupKey);
             if(dictBody == null)
             {
-                Debug.LogError("Can't find group with key " + groupKey);
+                if (_DebugModeEnable)
+                    Debug.LogError("Can't find group with key " + groupKey);
                 return "";
             }
             var str = dictBody.strings.Find(s => s.key == key);
             if(str == null)
             {
-                Debug.LogError("Can't find string with key " + key);
+                if (_DebugModeEnable)
+                    Debug.LogError("Can't find string with key " + key);
                 return "";
             }
             return str.GetString();
@@ -37,10 +41,33 @@ namespace SlizzLoc
 
             if(groupIndex >= LocalizationHolder.Prefab.dicts.Count)
             {
-                Debug.LogError("Can't find group with index " + groupIndex);
+                if (_DebugModeEnable)
+                    Debug.LogError("Can't find group with index " + groupIndex);
                 return "";
             }
             return GetString(LocalizationHolder.Prefab.dicts[groupIndex].key, key);
+        }
+
+        public static LocalizationString GetStringAsObject(string groupKey, string key)
+        {
+            if (ShowErrorNonPrefab())
+                return null;
+
+            var dictBody = LocalizationHolder.Prefab.dicts.Find(d => d.key == groupKey);
+            if (dictBody == null)
+            {
+                if (_DebugModeEnable)
+                    Debug.LogError("Can't find group with key " + groupKey);
+                return null;
+            }
+            var str = dictBody.strings.Find(s => s.key == key);
+            if (str == null)
+            {
+                if (_DebugModeEnable)
+                    Debug.LogError("Can't find string with key " + key);
+                return null;
+            }
+            return str;
         }
 
         public static void AddString(string groupKey, string key, params string[] strings)
@@ -51,11 +78,15 @@ namespace SlizzLoc
             var dictBody = LocalizationHolder.Prefab.dicts.Find(d => d.key == groupKey);
             if (dictBody == null)
             {
-                Debug.LogError("Can't find group with key " + groupKey);
+                if (_DebugModeEnable)
+                    Debug.LogError("Can't find group with key " + groupKey);
                 return;
             }
 
             dictBody.strings.Add(new LocalizationString() { key = key, strings = new List<string>(strings) });
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(LocalizationHolder.Prefab);
+#endif
         }
 
         public static void AddGroup(string key)
@@ -74,7 +105,8 @@ namespace SlizzLoc
             var dictBody = LocalizationHolder.Prefab.dicts.Find(d => d.key == key);
             if (dictBody == null)
             {
-                Debug.LogError("Can't find group with key " + key);
+                if (_DebugModeEnable)
+                    Debug.LogError("Can't find group with key " + key);
                 return null;
             }
 
@@ -129,7 +161,8 @@ namespace SlizzLoc
         {
             if(LocalizationHolder.Prefab == null)
             {
-                Debug.LogError("There are no LocalizationHolder prefab. Please open Window/Localization Slizz and init!");
+                if (_DebugModeEnable)
+                    Debug.LogError("There are no LocalizationHolder prefab. Please open Window/Localization Slizz and init!");
                 return true;
             }
             return false;
