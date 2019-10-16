@@ -25,7 +25,7 @@ Use Localization.unitypackage to automaticaly import as asset, or just import "L
 
 You can change language from "Options" and from SlizzLoc.Localization.SetLanguage(index)
 
-# New struct with dinamyc select which dict and string you want to use!
+# New struct with dinamycally select which dict and string you want to use! LocPair
 
 ![gif](https://user-images.githubusercontent.com/32653296/66953149-96de6b00-f066-11e9-97cf-dceeac083daf.gif)
 
